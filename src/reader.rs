@@ -6,21 +6,39 @@ pub struct Reader<'a> {
     pos: usize,
 }
 
+/// Specialized reader for reading XNB data
 impl<'a> Reader<'a> {
     pub fn new(buf: &'a [u8]) -> Self {
         Self { buf, pos: 0 }
     }
 
-    pub fn with_bits<T>(
-        &mut self,
-        f: impl FnOnce(&mut BitReader<'a>) -> Result<T, EnactError>,
-    ) -> Result<T, EnactError> {
-        let mut bit_reader = BitReader::new(*self);
-        let out = f(&mut bit_reader)?;
+    pub fn encoded_int_7bit(&mut self) -> Result<i32, EnactError> {
+        let mut result = 0;
+        let mut bits_read = 0;
+        let mut value;
 
-        *self = bit_reader.into_inner()?;
+        loop {
+            if bits_read == 35 {
+                return Err(EnactError::Overflow);
+            }
 
-        Ok(out)
+            value = self.take(1)?[0] as i32;
+            result |= (value & 0x7F) << bits_read;
+            bits_read += 7;
+
+            if value & 0x80 == 0 {
+                break;
+            }
+        }
+
+        Ok(result)
+    }
+
+    pub fn string(&mut self) -> Result<String, EnactError> {
+        let string_size = self.encoded_int_7bit()?;
+        let string_bytes = self.bytes(string_size as usize)?;
+
+        Ok(String::from_utf8_lossy(string_bytes).into_owned())
     }
 
     pub fn u8(&mut self) -> Result<u8, EnactError> {
