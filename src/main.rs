@@ -3,13 +3,12 @@ use std::fs;
 use tracing::info;
 use tracing_subscriber::{EnvFilter, fmt};
 
-use crate::{models::xnb_file::XNBFile, reader::Reader};
+use crate::{models::xnb_file::XNBFile, readers::byte_reader::ByteReader};
 
-mod bit_reader;
 mod error;
 mod lzx;
 mod models;
-mod reader;
+mod readers;
 
 fn main() -> anyhow::Result<()> {
     fmt()
@@ -20,7 +19,7 @@ fn main() -> anyhow::Result<()> {
         .init();
 
     let buf = fs::read("Acc_Back_1.xnb")?;
-    let mut reader = Reader::new(&buf);
+    let mut reader = ByteReader::new(&buf);
 
     let file = XNBFile::from_reader(&mut reader)?;
 

@@ -3,7 +3,7 @@ use tracing::trace;
 use crate::{
     error::EnactError,
     models::{xnb_flag_bits::XNBFlagBits, xnb_target_platform::XNBTargetPlatform},
-    reader::Reader,
+    readers::byte_reader::ByteReader,
 };
 
 #[derive(Debug)]
@@ -17,7 +17,7 @@ pub struct XNBFileHeader {
 
 impl XNBFileHeader {
     #[tracing::instrument(skip_all, fields(offset = reader.pos(), err))]
-    pub fn from_reader(reader: &mut Reader) -> Result<Self, EnactError> {
+    pub fn from_reader(reader: &mut ByteReader) -> Result<Self, EnactError> {
         let magic = reader.bytes(3)?;
         if magic != b"XNB" {
             return Err(EnactError::BadMagic);

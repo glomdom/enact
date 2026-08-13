@@ -1,8 +1,6 @@
+use crate::{error::EnactError, lzx::tree::Tree, readers::bit_reader::BitReader};
 use std::cmp::min;
-
 use tracing::trace;
-
-use crate::{bit_reader::BitReader, error::EnactError, lzx::tree::Tree};
 
 const EXTRA_BITS: [u8; 51] = {
     let mut t = [0u8; 51];

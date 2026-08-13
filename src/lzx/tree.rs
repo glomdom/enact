@@ -1,6 +1,6 @@
 use tracing::trace;
 
-use crate::{bit_reader::BitReader, error::EnactError};
+use crate::{error::EnactError, readers::bit_reader::BitReader};
 
 #[derive(Debug)]
 pub struct Tree {

@@ -1,14 +1,15 @@
-use crate::{error::EnactError, reader::Reader};
+use crate::error::EnactError;
+use crate::readers::byte_reader::ByteReader;
 
 pub struct BitReader<'a> {
-    inner: Reader<'a>,
+    inner: ByteReader<'a>,
     buf: u32,
     n: u32,
     pad: u32,
 }
 
 impl<'a> BitReader<'a> {
-    pub fn new(inner: Reader<'a>) -> Self {
+    pub fn new(inner: ByteReader<'a>) -> Self {
         Self {
             inner,
             buf: 0,

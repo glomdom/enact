@@ -1,13 +1,13 @@
 use crate::error::EnactError;
 
 #[derive(Clone, Copy)]
-pub struct Reader<'a> {
+pub struct ByteReader<'a> {
     buf: &'a [u8],
     pos: usize,
 }
 
 /// Specialized reader for reading XNB data
-impl<'a> Reader<'a> {
+impl<'a> ByteReader<'a> {
     pub fn new(buf: &'a [u8]) -> Self {
         Self { buf, pos: 0 }
     }
