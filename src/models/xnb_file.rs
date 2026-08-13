@@ -1,10 +1,13 @@
-use std::{cmp::min, fmt::Debug};
+use std::{cmp::min, collections::HashMap, fmt::Debug};
 
 use tracing::trace;
 
 use crate::{
-    bit_reader::BitReader, error::EnactError, lzx::decoder::LZXDecoder,
-    models::xnb_file_header::XNBFileHeader, reader::Reader,
+    bit_reader::BitReader,
+    error::EnactError,
+    lzx::decoder::LZXDecoder,
+    models::{xnb_file_header::XNBFileHeader, xnb_texture2d::XNBTexture2D},
+    reader::Reader,
 };
 
 pub struct XNBFile {
@@ -54,6 +57,29 @@ impl XNBFile {
         }
 
         let out = decoder.into_output();
+        let mut out_reader = Reader::new(&out);
+
+        let type_reader_count = out_reader.encoded_int_7bit()? as usize;
+        let mut type_readers = HashMap::new();
+
+        for reader_num in 0..type_reader_count {
+            let reader_name = out_reader.string()?;
+            let _version = out_reader.u32_le()?;
+
+            type_readers.insert(reader_num, reader_name);
+        }
+
+        let shared_resources = out_reader.encoded_int_7bit()? as usize;
+        let primary_asset_id = out_reader.encoded_int_7bit()? as usize;
+
+        let asset_reader = type_readers
+            .get(&(primary_asset_id - 1))
+            .ok_or(EnactError::NoTypeReader)?;
+
+        trace!(?asset_reader, ?primary_asset_id);
+
+        let image = XNBTexture2D::from_reader(&mut out_reader)?;
+        trace!(?image);
 
         Ok(Self { header, data: out })
     }

@@ -35,6 +35,12 @@ pub enum EnactError {
     #[error("decoder not implemented")]
     NotImplemented,
 
+    #[error("unknown XNB surface format {0}")]
+    UnknownSurfaceFormat(i32),
+
+    #[error("no type reader was found in the file")]
+    NoTypeReader,
+
     #[error("unexpected eof at {at}, wanted {want} bytes")]
     Eof { at: usize, want: usize },
 }

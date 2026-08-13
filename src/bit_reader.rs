@@ -68,19 +68,4 @@ impl<'a> BitReader<'a> {
         self.buf <<= rem;
         self.n -= rem;
     }
-
-    pub fn into_inner(mut self) -> Result<Reader<'a>, EnactError> {
-        if self.n % 16 != 0 {
-            return Err(EnactError::Unaligned {
-                at: self.inner.pos(),
-            });
-        }
-
-        let real = (self.n / 16).saturating_sub(self.pad);
-        let pos = self.inner.pos() - (real as usize) * 2;
-
-        self.inner.seek(pos)?;
-
-        Ok(self.inner)
-    }
 }

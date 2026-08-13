@@ -1,4 +1,4 @@
-use crate::{bit_reader::BitReader, error::EnactError};
+use crate::error::EnactError;
 
 #[derive(Clone, Copy)]
 pub struct Reader<'a> {
@@ -51,6 +51,12 @@ impl<'a> Reader<'a> {
         Ok(u32::from_le_bytes(bytes.try_into().unwrap()))
     }
 
+    pub fn i32_le(&mut self) -> Result<i32, EnactError> {
+        let bytes = self.take(4)?;
+
+        Ok(i32::from_le_bytes(bytes.try_into().unwrap()))
+    }
+
     pub fn u16_le(&mut self) -> Result<u16, EnactError> {
         let bytes = self.take(2)?;
 
@@ -65,16 +71,6 @@ impl<'a> Reader<'a> {
 
     pub fn bytes(&mut self, n: usize) -> Result<&'a [u8], EnactError> {
         self.take(n)
-    }
-
-    pub fn seek(&mut self, at: usize) -> Result<(), EnactError> {
-        if at > self.buf.len() {
-            return Err(EnactError::Eof { at, want: 0 });
-        }
-
-        self.pos = at;
-
-        Ok(())
     }
 
     pub fn pos(&self) -> usize {
