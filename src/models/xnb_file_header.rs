@@ -16,7 +16,6 @@ pub struct XNBFileHeader {
 }
 
 impl XNBFileHeader {
-    #[tracing::instrument(skip_all, fields(offset = reader.pos(), err))]
     pub fn from_reader(reader: &mut ByteReader) -> Result<Self, EnactError> {
         let magic = reader.bytes(3)?;
         if magic != b"XNB" {

@@ -17,9 +17,6 @@ pub enum EnactError {
     #[error("unknown XNB flag bits")]
     BadFlagBits,
 
-    #[error("unaligned bit reader after moving")]
-    Unaligned { at: usize },
-
     #[error("invalid LZX window size {size}")]
     InvalidWindowSize { size: u8 },
 
@@ -37,6 +34,9 @@ pub enum EnactError {
 
     #[error("unknown XNB surface format {0}")]
     UnknownSurfaceFormat(i32),
+
+    #[error("unknown XNB type reader {0}")]
+    UnknownTypeReader(String),
 
     #[error("no type reader was found in the file")]
     NoTypeReader,

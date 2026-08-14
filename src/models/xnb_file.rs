@@ -2,11 +2,10 @@ use crate::{
     error::EnactError,
     lzx::decoder::LZXDecoder,
     models::{xnb_file_header::XNBFileHeader, xnb_texture2d::XNBTexture2D},
-    readers::bit_reader::BitReader,
-    readers::byte_reader::ByteReader,
+    readers::{bit_reader::BitReader, byte_reader::ByteReader, type_readers::TypeReaders},
 };
 
-use std::{cmp::min, collections::HashMap, fmt::Debug};
+use std::{cmp::min, collections::HashMap, fmt::Debug, str::FromStr};
 use tracing::trace;
 
 pub struct XNBFile {
@@ -24,7 +23,6 @@ impl Debug for XNBFile {
 }
 
 impl XNBFile {
-    #[tracing::instrument(skip_all, fields(offset = reader.pos(), err))]
     pub fn from_reader(reader: &mut ByteReader) -> Result<Self, EnactError> {
         let header = XNBFileHeader::from_reader(reader)?;
 
@@ -64,7 +62,7 @@ impl XNBFile {
             let reader_name = reader_full_name.split_once(',').unwrap().0.to_owned();
             let _version = out_reader.u32_le()?;
 
-            type_readers.insert(reader_num, reader_name);
+            type_readers.insert(reader_num, TypeReaders::from_str(&reader_name)?);
         }
 
         let _shared_resources_count = out_reader.encoded_int_7bit()? as usize; // todo

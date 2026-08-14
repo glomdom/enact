@@ -186,6 +186,7 @@ impl LZXDecoder {
         }
 
         br.align();
+
         Ok(())
     }
 
