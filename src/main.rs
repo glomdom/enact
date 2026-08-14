@@ -18,7 +18,7 @@ fn main() -> anyhow::Result<()> {
         .with_writer(std::io::stderr)
         .init();
 
-    let buf = fs::read("Acc_Back_1.xnb")?;
+    let buf = fs::read("TileShader.xnb")?;
     let mut reader = ByteReader::new(&buf);
 
     let file = XNBFile::from_reader(&mut reader)?;

@@ -1,8 +1,8 @@
 use crate::{
     error::EnactError,
     lzx::decoder::LZXDecoder,
-    models::{xnb_file_header::XNBFileHeader, xnb_texture2d::XNBTexture2D},
-    readers::{bit_reader::BitReader, byte_reader::ByteReader, type_readers::TypeReaders},
+    models::{xnb_effect::XNBEffect, xnb_file_header::XNBFileHeader, xnb_texture2d::XNBTexture2D},
+    readers::{bit_reader::BitReader, byte_reader::ByteReader, type_reader::TypeReader},
 };
 
 use std::{cmp::min, collections::HashMap, fmt::Debug, str::FromStr};
@@ -62,7 +62,7 @@ impl XNBFile {
             let reader_name = reader_full_name.split_once(',').unwrap().0.to_owned();
             let _version = out_reader.u32_le()?;
 
-            type_readers.insert(reader_num, TypeReaders::from_str(&reader_name)?);
+            type_readers.insert(reader_num, TypeReader::from_str(&reader_name)?);
         }
 
         let _shared_resources_count = out_reader.encoded_int_7bit()? as usize; // todo
@@ -74,8 +74,19 @@ impl XNBFile {
 
         trace!(?asset_reader);
 
-        let image = XNBTexture2D::from_reader(&mut out_reader)?;
-        trace!(?image);
+        match asset_reader {
+            TypeReader::Effect => {
+                let effect = XNBEffect::from_reader(&mut out_reader)?;
+
+                trace!(?effect);
+            }
+
+            TypeReader::Texture2D => {
+                let image = XNBTexture2D::from_reader(&mut out_reader)?;
+
+                trace!(?image);
+            }
+        }
 
         Ok(Self { header, data: out })
     }
