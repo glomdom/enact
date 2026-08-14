@@ -1,0 +1,10 @@
+[package]
+name = "enact_extractor"
+version = "0.0.1"
+edition = "2024"
+
+[dependencies]
+anyhow = "1.0.104"
+enact_parser = { path = "../enact_parser" }
+tracing = "0.1.44"
+tracing-subscriber = { version = "0.3.23", features = ["env-filter"] }
